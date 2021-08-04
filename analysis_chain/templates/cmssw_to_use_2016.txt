@@ -1,0 +1,30 @@
+for lhe and gen step:
+SCRAM_ARCH=slc6_amd64_gcc480
+
+and CMSSW release:
+CMSSW_7_1_43_patch1
+
+note for this case you need to run the .lhe files first diurectly using the gridpack
+then modify lhe_2016.py to list the .lhe files as inputs
+
+Note you also need to be using the correct SCRAM_ARCH before you submit the jobs to the grid
+The issue is that this CMSSW release does not exist for SLC7 so you can actually test the jobs locally before submitting them but if you use the correct SCRAM_ARCH and cmsenv inside the CMSSW release 
+the job should get run on a node with SLC6
+you can submit a small job first to check it works since you can't test it locally
+
+
+For the next steps we can use SLC7 so we can test locally again
+
+
+for premix and aod steps
+SCRAM_ARCH=slc7_amd64_gcc530
+
+and CMSSW release:
+CMSSW_8_0_31
+
+
+for miniaod step:
+SCRAM_ARCH=slc7_amd64_gcc630
+
+and CMSSW release:
+CMSSW_9_4_9

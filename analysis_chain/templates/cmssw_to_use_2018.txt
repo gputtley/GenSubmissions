@@ -1,0 +1,7 @@
+For all stages use:
+
+SCRAM_ARCH=slc7_amd64_gcc700
+
+and CMSSW version:
+
+CMSSW_10_2_16_UL

@@ -2,6 +2,7 @@ import argparse
 import os
 
 parser = argparse.ArgumentParser()
+parser.add_argument('--year',help= 'Year for config to run with', default='2018')
 parser.add_argument('--tarball',help= 'Inset name of tarball, only need for --gen', default='')
 parser.add_argument('--folder_name',help= 'Inset name of dcache folder', default='betaRd33_0_mU2_gU3')
 parser.add_argument("--gen", action='store_true',help="Run GEN-SIM")
@@ -14,13 +15,15 @@ parser.add_argument('--skip',help= 'If running with --run_all will skip this tar
 args = parser.parse_args()
 
 
-def ReadReplaceAndWrite(template,filename,tarball_name,folder_name,add_tasks=False,lines_to_add=[]):
+def ReadReplaceAndWrite(template,filename,tarball_name,folder_name,add_tasks=False,lines_to_add=[],nevents=None):
   # Read in the file
   with open(template, 'r') as file :
     filedata = file.read()
   
   # Replace the target string
   filedata = filedata.replace('TARBALL_FILENAME',tarball_name).replace('SAMPLE_FILENAME',folder_name)
+
+  if nevents != None: filedata = filedata.replace("N_EVENTS",str(nevents))
 
   if add_tasks:
     add_lines='tasks=list()\n'
@@ -67,15 +70,24 @@ elif args.miniaod:
 
 if args.gen:
   if not args.run_all:
-    ReadReplaceAndWrite("analysis_chain/templates/{}_2018_cfg.py".format(mn),"{}_{}_2018.py".format(mn,args.folder_name),args.tarball,args.folder_name)  
+    ReadReplaceAndWrite("analysis_chain/templates/run_gen_matched_{}.py".format(args.year),"{}_{}_{}.py".format(mn,args.folder_name,args.year),args.tarball,args.folder_name)  
     ReadReplaceAndWrite("analysis_chain/templates/crab_{}.py".format(mn),"crab_{}_{}.py".format(mn,args.folder_name),args.tarball,args.folder_name)
     if not args.dry_run: os.system("crab submit crab_{}_{}.py".format(mn,args.folder_name))
   else:
     for tarball in os.listdir("./"):
       if "tar.xz" in tarball and args.skip != tarball:
+        wanted_events = 200000
+        if "matched_xqcut_up" in tarball:
+          nevents = wanted_events*1.25
+        elif "matched_xqcut_down" in tarball:
+          nevents = wanted_events*2.5
+        elif "matched" in tarball:
+          nevents = wanted_events*1.6
+        else:
+          nevents = wanted_events
         folder_name = tarball.replace("_slc7_amd64_gcc700_CMSSW_10_6_19_tarball.tar.xz","")
-        ReadReplaceAndWrite("analysis_chain/templates/{}_2018_cfg.py".format(mn),"{}_{}_2018.py".format(mn,folder_name),tarball,folder_name)
-        ReadReplaceAndWrite("analysis_chain/templates/crab_{}.py".format(mn),"crab_{}_{}.py".format(mn,folder_name),tarball,folder_name)
+        ReadReplaceAndWrite("analysis_chain/templates/run_gen_matched_{}.py".format(args.year),"{}_{}_{}.py".format(mn,folder_name,args.year),tarball,folder_name,nevents=int(nevents))
+        ReadReplaceAndWrite("analysis_chain/templates/crab_{}.py".format(mn),"crab_{}_{}.py".format(mn,folder_name),tarball,folder_name,nevents=int(nevents))
         if not args.dry_run: os.system("crab submit crab_{}_{}.py".format(mn,folder_name))
 else:
   if not args.run_all: it_over = [args.folder_name]
@@ -86,9 +98,9 @@ else:
         it_over.append(tarball.replace("_slc7_amd64_gcc700_CMSSW_10_6_19_tarball.tar.xz",""))
   tasks_to_add = []
   for i in it_over:
-    tasks_to_add.append("tasks.append(('{}_2018_{}', '{}', '{}_2018_{}'))".format(i,mn.upper(),get_dataset(i,ps,cl),i,mn.upper()))
+    tasks_to_add.append("tasks.append(('{}_{}_{}', '{}', '{}_{}_{}'))".format(i,args.year,mn.upper(),get_dataset(i,ps,cl),i,args.year,mn.upper()))
  
-  ReadReplaceAndWrite("analysis_chain/templates/{}_2018_cfg.py".format(mn),"{}_2018.py".format(mn),"","")
+  ReadReplaceAndWrite("analysis_chain/templates/{}_{}_cfg.py".format(mn,args.year),"{}_{}.py".format(mn,args.year),"","")
   ReadReplaceAndWrite("analysis_chain/templates/crab_{}.py".format(mn),"crab_{}.py".format(mn),"","",add_tasks=True,lines_to_add=tasks_to_add)
   if not args.dry_run: os.system("python crab_{}.py".format(mn))
  
