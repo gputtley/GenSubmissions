@@ -69,24 +69,42 @@ elif args.miniaod:
   cl = "AOD"
 
 if args.gen:
+
+  wanted_events = 200000
   if not args.run_all:
+    if "matched_xqcut_up" in args.tarball:
+      nevents = wanted_events*1.25
+      cfg = "run_gen_matched_up_{}.py".format(args.year)
+    elif "matched_xqcut_down" in args.tarball:
+      nevents = wanted_events*2.5
+      cfg = "run_gen_matched_down_{}.py".format(args.year)
+    elif "matched" in args.tarball:
+      nevents = wanted_events*1.6
+      cfg = "run_gen_matched_{}.py".format(args.year)
+    else:
+      nevents = wanted_events
+      cfg = "gen_{}_cfg.py".format(args.year)
+
     ReadReplaceAndWrite("analysis_chain/templates/run_gen_matched_{}.py".format(args.year),"{}_{}_{}.py".format(mn,args.folder_name,args.year),args.tarball,args.folder_name)  
     ReadReplaceAndWrite("analysis_chain/templates/crab_{}.py".format(mn),"crab_{}_{}.py".format(mn,args.folder_name),args.tarball,args.folder_name)
     if not args.dry_run: os.system("crab submit crab_{}_{}.py".format(mn,args.folder_name))
   else:
     for tarball in os.listdir("./"):
       if "tar.xz" in tarball and args.skip != tarball:
-        wanted_events = 200000
         if "matched_xqcut_up" in tarball:
           nevents = wanted_events*1.25
+          cfg = "run_gen_matched_up_{}.py".format(args.year)
         elif "matched_xqcut_down" in tarball:
           nevents = wanted_events*2.5
+          cfg = "run_gen_matched_down_{}.py".format(args.year)
         elif "matched" in tarball:
           nevents = wanted_events*1.6
+          cfg = "run_gen_matched_{}.py".format(args.year)
         else:
           nevents = wanted_events
+          cfg = "gen_{}_cfg.py".format(args.year)
         folder_name = tarball.replace("_slc7_amd64_gcc700_CMSSW_10_6_19_tarball.tar.xz","")
-        ReadReplaceAndWrite("analysis_chain/templates/run_gen_matched_{}.py".format(args.year),"{}_{}_{}.py".format(mn,folder_name,args.year),tarball,folder_name,nevents=int(nevents))
+        ReadReplaceAndWrite("analysis_chain/templates/{}".format(cfg),"{}_{}_{}.py".format(mn,folder_name,args.year),tarball,folder_name,nevents=int(nevents))
         ReadReplaceAndWrite("analysis_chain/templates/crab_{}.py".format(mn),"crab_{}_{}.py".format(mn,folder_name),tarball,folder_name,nevents=int(nevents))
         if not args.dry_run: os.system("crab submit crab_{}_{}.py".format(mn,folder_name))
 else:

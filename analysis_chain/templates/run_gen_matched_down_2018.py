@@ -192,8 +192,8 @@ process.generator = cms.EDFilter("Pythia8HadronizerFilter",
 
 
 process.externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
-    args = cms.vstring('/afs/cern.ch/work/d/dwinterb/private/lqmc/genproductions/bin/MadGraph5_aMCatNLO/betaRd33_0_mU4_gU1_matched_xqcut_down_slc7_amd64_gcc700_CMSSW_10_6_19_tarball.tar.xz'),
-    nEvents = cms.untracked.uint32(100),
+    args = cms.vstring('../TARBALL_FILENAME'),
+    nEvents = cms.untracked.uint32(N_EVENTS),
     numberOfParameters = cms.uint32(1),
     outputFile = cms.string('cmsgrid_final.lhe'),
     scriptName = cms.FileInPath('GeneratorInterface/LHEInterface/data/run_generic_tarball_cvmfs.sh')
