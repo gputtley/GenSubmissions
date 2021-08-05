@@ -37,10 +37,11 @@ def ReadReplaceAndWrite(template,filename,tarball_name,folder_name,add_tasks=Fal
 
 def get_dataset(folder,ps,cl):
   ps = ps.upper()
+  year = args.year
   if ps == "gensim":
-    os.system("crab status %(cl)s/%(folder)s_%(ps)s_2018/crab_%(folder)s_%(ps)s_2018 >> crab_status_output.txt" % vars())
+    os.system("crab status %(cl)s/%(folder)s_%(ps)s_%(year)s/crab_%(folder)s_%(ps)s_%(year)s >> crab_status_output.txt" % vars())
   else:
-    os.system("crab status %(cl)s/crab_%(folder)s_2018_%(ps)s >> crab_status_output.txt" % vars())
+    os.system("crab status %(cl)s/crab_%(folder)s_%(year)s_%(ps)s >> crab_status_output.txt" % vars())
   crab_status_file = open('crab_status_output.txt', 'r')
   for line in crab_status_file:
     if "Output dataset:" in line:
@@ -86,7 +87,7 @@ if args.gen:
       cfg = "gen_{}_cfg.py".format(args.year)
 
     ReadReplaceAndWrite("analysis_chain/templates/run_gen_matched_{}.py".format(args.year),"{}_{}_{}.py".format(mn,args.folder_name,args.year),args.tarball,args.folder_name)  
-    ReadReplaceAndWrite("analysis_chain/templates/crab_{}.py".format(mn),"crab_{}_{}.py".format(mn,args.folder_name),args.tarball,args.folder_name)
+    ReadReplaceAndWrite("analysis_chain/templates/crab_{}_{}.py".format(mn,args.year),"crab_{}_{}.py".format(mn,args.folder_name),args.tarball,args.folder_name)
     if not args.dry_run: os.system("crab submit crab_{}_{}.py".format(mn,args.folder_name))
   else:
     for tarball in os.listdir("./"):
@@ -105,7 +106,7 @@ if args.gen:
           cfg = "gen_{}_cfg.py".format(args.year)
         folder_name = tarball.replace("_slc7_amd64_gcc700_CMSSW_10_6_19_tarball.tar.xz","")
         ReadReplaceAndWrite("analysis_chain/templates/{}".format(cfg),"{}_{}_{}.py".format(mn,folder_name,args.year),tarball,folder_name,nevents=int(nevents))
-        ReadReplaceAndWrite("analysis_chain/templates/crab_{}.py".format(mn),"crab_{}_{}.py".format(mn,folder_name),tarball,folder_name,nevents=int(nevents))
+        ReadReplaceAndWrite("analysis_chain/templates/crab_{}_{}.py".format(mn,args.year),"crab_{}_{}.py".format(mn,folder_name),tarball,folder_name,nevents=int(nevents))
         if not args.dry_run: os.system("crab submit crab_{}_{}.py".format(mn,folder_name))
 else:
   if not args.run_all: it_over = [args.folder_name]
