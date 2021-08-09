@@ -38,13 +38,12 @@ def ReadReplaceAndWrite(template,filename,tarball_name,folder_name,add_tasks=Fal
 def get_dataset(folder,ps,cl):
   ps = ps.upper()
   year = args.year
-  if ps == "gensim":
+  if ps == "GENSIM":
     os.system("crab status %(cl)s/%(folder)s_%(ps)s_%(year)s/crab_%(folder)s_%(ps)s_%(year)s >> crab_status_output.txt" % vars())
   else:
     os.system("crab status %(cl)s/crab_%(folder)s_%(year)s_%(ps)s >> crab_status_output.txt" % vars())
   crab_status_file = open('crab_status_output.txt', 'r')
   for line in crab_status_file:
-    print line
     if "Output dataset:" in line:
       output_dataset = line.split("Output dataset:")[1].strip()
   os.system("rm crab_status_output.txt")
@@ -121,7 +120,7 @@ else:
     tasks_to_add.append("tasks.append(('{}_{}_{}', '{}', '{}_{}_{}'))".format(i,args.year,mn.upper(),get_dataset(i,ps,cl),i,args.year,mn.upper()))
  
   ReadReplaceAndWrite("analysis_chain/templates/{}_{}.py".format(mn,args.year),"{}_{}.py".format(mn,args.year),"","")
-  ReadReplaceAndWrite("analysis_chain/templates/crab_{}_{}.py".format(mn,args.year),"crab_{}.py".format(mn),"","",add_tasks=True,lines_to_add=tasks_to_add)
+  ReadReplaceAndWrite("analysis_chain/templates/crab_{}_{}.py".format(mn,args.year),"crab_{}_{}.py".format(mn,args.year),"","",add_tasks=True,lines_to_add=tasks_to_add)
   if not args.dry_run: os.system("python crab_{}_{}.py".format(mn,args.year))
  
 
