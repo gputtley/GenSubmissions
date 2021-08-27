@@ -2,19 +2,19 @@ from CRABClient.UserUtilities import config
 from multiprocessing import Process
 config = config()
 
-config.General.requestName     = 'GEN'
-config.General.workArea        = 'GEN'
+config.General.requestName     = 'SAMPLE_FILENAME_GENSIM_2016'
+config.General.workArea        = 'SAMPLE_FILENAME_GENSIM_2016'
 config.General.transferOutputs = True
 config.General.transferLogs    = True
 
 config.JobType.pluginName = 'ANALYSIS'
-config.JobType.psetName   = 'gen_from_lhe_2016.py'
+config.JobType.psetName   = 'gen_SAMPLE_FILENAME_2016.py'
 
 config.Data.inputDBS             = 'phys03'
 config.Data.splitting            = 'EventAwareLumiBased'
 config.Data.unitsPerJob          = 500
 config.Data.totalUnits           = -1
-config.Data.outLFNDirBase        = '/store/user/dwinterb/bbH_GEN/'
+config.Data.outLFNDirBase        = '/store/user/guttley/'
 config.Data.publication          = True
 config.Data.ignoreLocality      = True
 
@@ -42,7 +42,6 @@ if __name__ == '__main__':
 
     tasks=list()
 
-    tasks.append(('bbH_m200_2016_GEN', 'copy_dataset_name_here', 'bbH_m200_2016_GEN'))
 
     for task in tasks:
         print task[0]
