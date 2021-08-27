@@ -64,7 +64,7 @@ while (time.time() - start_time) < int(args.duration)*60:
 
 
   # print dictionary
-  spacing = [40,15,15,15,15,15,15,40]
+  spacing = [75,13,10,10,10,10,15,10]
   headings = status_dict[status_dict.keys()[0]].keys()
   headings2 = ["Filename"] + headings
   sep = "+"
