@@ -39,9 +39,12 @@ def get_dataset(folder,ps,cl):
   ps = ps.upper()
   year = args.year
   if ps == "GENSIM":
-    os.system("crab status %(cl)s/%(folder)s_%(ps)s_%(year)s/crab_%(folder)s_%(ps)s_%(year)s >> crab_status_output.txt" % vars())
+    if args.year != "2016":
+      os.system("crab status %(cl)s/%(folder)s_%(ps)s_%(year)s/crab_%(folder)s_%(ps)s_%(year)s >> crab_status_output.txt" % vars())
+    else:
+      os.system("crab status %(cl)s/%(folder)s_%(ps)s_%(year)s/crab_%(folder)s_2016_GEN >> crab_status_output.txt" % vars())
   else:
-    os.system("crab status %(cl)s/crab_%(folder)s_%(year)s_%(ps)s >> crab_status_output.txt" % vars())
+      os.system("crab status %(cl)s/crab_%(folder)s_%(year)s_%(ps)s >> crab_status_output.txt" % vars())
   crab_status_file = open('crab_status_output.txt', 'r')
   for line in crab_status_file:
     if "Output dataset:" in line:
@@ -117,6 +120,7 @@ else:
         it_over.append(tarball.replace("_slc7_amd64_gcc700_CMSSW_10_6_19_tarball.tar.xz",""))
   tasks_to_add = []
   for i in it_over:
+    print i
     tasks_to_add.append("tasks.append(('{}_{}_{}', '{}', '{}_{}_{}'))".format(i,args.year,mn.upper(),get_dataset(i,ps,cl),i,args.year,mn.upper()))
  
   ReadReplaceAndWrite("analysis_chain/templates/{}_{}.py".format(mn,args.year),"{}_{}.py".format(mn,args.year),"","")
