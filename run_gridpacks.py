@@ -2,9 +2,11 @@ import argparse
 import os
 
 parser = argparse.ArgumentParser()
+parser.add_argument('--input',help= 'location of input gridpacks', default='/afs/cern.ch/work/g/guttley/private/gridpacks/')
 parser.add_argument('--year',help= 'Year for config to run with', default='2018')
 parser.add_argument('--tarball',help= 'Inset name of tarball, only need for --gen', default='')
 parser.add_argument('--folder_name',help= 'Inset name of dcache folder', default='betaRd33_0_mU2_gU3')
+parser.add_argument("--lhe", action='store_true',help="Run LHE")
 parser.add_argument("--gen", action='store_true',help="Run GEN-SIM")
 parser.add_argument("--premix", action='store_true',help="Run premix")
 parser.add_argument("--aod", action='store_true',help="Run AOD")
@@ -43,6 +45,8 @@ def get_dataset(folder,ps,cl):
       os.system("crab status %(cl)s/%(folder)s_%(ps)s_%(year)s/crab_%(folder)s_%(ps)s_%(year)s >> crab_status_output.txt" % vars())
     else:
       os.system("crab status %(cl)s/%(folder)s_%(ps)s_%(year)s/crab_%(folder)s_2016_GEN >> crab_status_output.txt" % vars())
+  if ps == "LHE":
+    os.system("crab status %(cl)s/%(folder)s_%(ps)s/crab_%(folder)s_%(ps)s >> crab_status_output.txt" % vars())
   else:
       os.system("crab status %(cl)s/crab_%(folder)s_%(year)s_%(ps)s >> crab_status_output.txt" % vars())
   crab_status_file = open('crab_status_output.txt', 'r')
@@ -87,14 +91,19 @@ if args.gen:
       cfg = "run_gen_matched_{}.py".format(args.year)
     else:
       nevents = wanted_events
-      cfg = "gen_{}_cfg.py".format(args.year)
+      if args.year != "2016":
+        cfg = "gen_{}_cfg.py".format(args.year)
+      else:
+        cfg = "gen_from_lhe_2016.py" 
 
-    ReadReplaceAndWrite("analysis_chain/templates/run_gen_matched_{}.py".format(args.year),"{}_{}_{}.py".format(mn,args.folder_name,args.year),args.tarball,args.folder_name)  
-    ReadReplaceAndWrite("analysis_chain/templates/crab_{}_{}.py".format(mn,args.year),"crab_{}_{}.py".format(mn,args.folder_name),args.tarball,args.folder_name)
+    if args.year == "2016": cfg = cfg.replace("run_gen","gen_from_lhe")
+
+    ReadReplaceAndWrite("templates/{}".format(cfg),"{}_{}_{}.py".format(mn,args.folder_name,args.year),args.tarball,args.folder_name)  
+    ReadReplaceAndWrite("templates/crab_{}_{}.py".format(mn,args.year),"crab_{}_{}.py".format(mn,args.folder_name),args.tarball,args.folder_name)
     if not args.dry_run: os.system("crab submit crab_{}_{}.py".format(mn,args.folder_name))
   else:
-    for tarball in os.listdir("./"):
-      if "tar.xz" in tarball and args.skip != tarball:
+    for tarball in os.listdir(args.input):
+      if "tar.xz" in tarball and tarball not in args.skip.split(","):
         if "matched_xqcut_up" in tarball:
           nevents = wanted_events*1.25
           cfg = "run_gen_matched_up_{}.py".format(args.year)
@@ -106,25 +115,50 @@ if args.gen:
           cfg = "run_gen_matched_{}.py".format(args.year)
         else:
           nevents = wanted_events
-          cfg = "gen_{}_cfg.py".format(args.year)
+          if args.year != "2016":
+            cfg = "gen_{}_cfg.py".format(args.year)
+          else:
+            cfg = "gen_from_lhe_2016.py"
+
+        lta = []
+        add_tasks = False
         folder_name = tarball.replace("_slc7_amd64_gcc700_CMSSW_10_6_19_tarball.tar.xz","")
-        ReadReplaceAndWrite("analysis_chain/templates/{}".format(cfg),"{}_{}_{}.py".format(mn,folder_name,args.year),tarball,folder_name,nevents=int(nevents))
-        ReadReplaceAndWrite("analysis_chain/templates/crab_{}_{}.py".format(mn,args.year),"crab_{}_{}.py".format(mn,folder_name),tarball,folder_name,nevents=int(nevents))
-        if not args.dry_run: os.system("crab submit crab_{}_{}.py".format(mn,folder_name))
+        if args.year == "2016": 
+          cfg = cfg.replace("run_gen","gen_from_lhe")
+          lta.append("tasks.append(('{}_{}_{}', '{}', '{}_{}_{}'))".format(folder_name,args.year,mn.upper(),get_dataset(folder_name,"LHE","./"),folder_name,args.year,mn.upper()))
+          add_tasks = True
+
+        ReadReplaceAndWrite("templates/{}".format(cfg),"{}_{}_{}.py".format(mn,folder_name,args.year),tarball,folder_name,nevents=int(nevents))
+        ReadReplaceAndWrite("templates/crab_{}_{}.py".format(mn,args.year),"crab_{}_{}.py".format(mn,folder_name),tarball,folder_name,nevents=int(nevents),lines_to_add=lta,add_tasks=add_tasks)
+        if not args.dry_run: 
+          if args.year != "2016": os.system("crab submit crab_{}_{}.py".format(mn,folder_name))
+          else: os.system("python crab_{}_{}.py".format(mn,folder_name))
+elif args.lhe and args.year == "2016":
+  if not args.run_all: it_over = [args.folder_name]
+  else:
+    it_over = []
+    for tarball in os.listdir(args.input):
+      if "tar.xz" in tarball and tarball not in args.skip.split(","):
+        it_over.append(tarball.replace("_slc7_amd64_gcc700_CMSSW_10_6_19_tarball.tar.xz",""))
+  tasks_to_add = []
+  for i in it_over:
+    ReadReplaceAndWrite("templates/lhe_2016.py","{}_lhe_2016.py".format(i),"",i)
+    ReadReplaceAndWrite("templates/crab_lhe_2016.py","crab_lhe_2016_{}.py".format(i),i+"_slc7_amd64_gcc700_CMSSW_10_6_19_tarball.tar.xz",i)
+    if not args.dry_run: os.system("crab submit crab_lhe_2016_{}.py".format(i))
+
 else:
   if not args.run_all: it_over = [args.folder_name]
   else:  
     it_over = []
-    for tarball in os.listdir("./"):
-      if "tar.xz" in tarball and args.skip != tarball:
+    for tarball in os.listdir(args.input):
+      if "tar.xz" in tarball and tarball not in args.skip.split(","):
         it_over.append(tarball.replace("_slc7_amd64_gcc700_CMSSW_10_6_19_tarball.tar.xz",""))
   tasks_to_add = []
   for i in it_over:
-    print i
     tasks_to_add.append("tasks.append(('{}_{}_{}', '{}', '{}_{}_{}'))".format(i,args.year,mn.upper(),get_dataset(i,ps,cl),i,args.year,mn.upper()))
  
-  ReadReplaceAndWrite("analysis_chain/templates/{}_{}.py".format(mn,args.year),"{}_{}.py".format(mn,args.year),"","")
-  ReadReplaceAndWrite("analysis_chain/templates/crab_{}_{}.py".format(mn,args.year),"crab_{}_{}.py".format(mn,args.year),"","",add_tasks=True,lines_to_add=tasks_to_add)
+  ReadReplaceAndWrite("templates/{}_{}.py".format(mn,args.year),"{}_{}.py".format(mn,args.year),"","")
+  ReadReplaceAndWrite("templates/crab_{}_{}.py".format(mn,args.year),"crab_{}_{}.py".format(mn,args.year),"","",add_tasks=True,lines_to_add=tasks_to_add)
   if not args.dry_run: os.system("python crab_{}_{}.py".format(mn,args.year))
  
 

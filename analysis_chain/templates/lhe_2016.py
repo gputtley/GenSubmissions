@@ -20,7 +20,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("LHESource",
     fileNames = cms.untracked.vstring(
-'root://gfe02.grid.hep.ph.ic.ac.uk:1097/store/user/guttley/vlq_lhe/cmsgrid_final_betaRd33_0_mU1000_gU1.lhe')
+'root://gfe02.grid.hep.ph.ic.ac.uk:1097/store/user/guttley/vlq_lhe/cmsgrid_final_SAMPLE_FILENAME.lhe')
 )
 
 process.options = cms.untracked.PSet(
