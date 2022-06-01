@@ -31,12 +31,12 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:HIG-RunIISummer20UL18HLT-00368.root'),
+    fileNames = cms.untracked.vstring('file:HLT.root'),
     secondaryFileNames = cms.untracked.vstring()
 )
 
 process.options = cms.untracked.PSet(
-
+  numberOfThreads = cms.untracked.int32(8)
 )
 
 # Production Info
@@ -56,7 +56,7 @@ process.AODSIMoutput = cms.OutputModule("PoolOutputModule",
         filterName = cms.untracked.string('')
     ),
     eventAutoFlushCompressedSize = cms.untracked.int32(31457280),
-    fileName = cms.untracked.string('file:HIG-RunIISummer20UL18RECO-00368.root'),
+    fileName = cms.untracked.string('file:RECO.root'),
     outputCommands = process.AODSIMEventContent.outputCommands
 )
 
