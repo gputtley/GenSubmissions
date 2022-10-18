@@ -2,17 +2,13 @@
 
 ## Submitting each analysis step crab jobs
 
-First copy all of the tarball files into this working directory.
-
-To submit GEN-SIM crab jobs for all tarball files in your working directory run a command like:
+To submit LHEGEN crab jobs for all tarball files run a command like:
 
 ```bash
-python run_gridpacks.py --run_all --gen --year=2018
+python run_gridpacks.py --run_all --year=2018
 ```
 
-(This is not currently set up well for 2016 LHE step, currently will only look for cmsgrid_final_SAMPLE_FILENAME.lhe file in a specific location in my dCache. I would run this with --dry_run option and then change the configs generated and submit manually.)
-
-To run future steps you can change --gen with either --premix, --aod or --miniaod. The crab submission files will automatically get the right file locations from the previous step of crab submissions folders. If you need to work in a new CMSSW to run step, copy the crab submission folders over (as well as the gridpacks - need to change this as gridpacks are large and only needed to loop over files).
+To run future steps, you can run the identical command. The templates/cmssw_to_use_YEAR.txt keeps track of what stage you are at.
 
 ## Checking and resubmitting crab jobs
 
