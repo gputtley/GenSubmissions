@@ -10,7 +10,7 @@ parser.add_argument('--tarball',help= 'Inset name of tarball, only need for --ge
 parser.add_argument("--dry_run", action='store_true',help="Will create files but not run them")
 parser.add_argument("--run_all", action='store_true',help="Will run all tar.xz files in input directory")
 parser.add_argument('--skip',help= 'If running with --run_all will skip this tarball', default='')
-parser.add_argument('--events',help= 'Number of events to run for', default='20000')
+parser.add_argument('--events',help= 'Number of events to run for', default='200000')
 args = parser.parse_args()
 
 f = open("templates/cmssw_to_use_{}.txt".format(args.year), "r")
@@ -25,13 +25,13 @@ nevents = args.events
 CMSSW = cmssws[step]
 
 
-def ReadReplaceAndWrite(template,filename,tarball_name,folder_name,add_tasks=False,lines_to_add=[],nevents=None):
+def ReadReplaceAndWrite(template,filename,tarball_name,folder_name,year,add_tasks=False,lines_to_add=[],nevents=None):
   # Read in the file
   with open(template, 'r') as file :
     filedata = file.read()
   
   # Replace the target string
-  filedata = filedata.replace('TARBALL_FILENAME',tarball_name).replace('SAMPLE_FILENAME',folder_name)
+  filedata = filedata.replace('TARBALL_FILENAME',tarball_name).replace('SAMPLE_FILENAME',folder_name).replace("YEAR_NAME",year)
 
   if nevents != None: filedata = filedata.replace("NEVENTS",str(nevents))
 
@@ -52,6 +52,7 @@ def get_dataset(folder,steps,cmssws,step):
   if step == 1:
     os.system("crab status %(pCMSSW)s/src/%(folder)s/crab_%(folder)s >> crab_status_output.txt" % vars())
   else:
+      print "crab status %(pCMSSW)s/src/%(ps)s/crab_%(folder)s_%(year)s_%(ps)s >> crab_status_output.txt" % vars()
       os.system("crab status %(pCMSSW)s/src/%(ps)s/crab_%(folder)s_%(year)s_%(ps)s >> crab_status_output.txt" % vars())
   crab_status_file = open('crab_status_output.txt', 'r')
   for line in crab_status_file:
@@ -75,10 +76,10 @@ if step == 0:
         if args.run_all or (args.tarball == tarball):
           cfg = "{}_{}_cfg.py".format(steps[step],args.year)
           new_cfg = "{}_{}_{}.py".format(steps[step],folder_name,args.year)
-          sub = "crab_{}_{}.py".format(steps[step],args.year)
+          sub = "crab_{}.py".format(steps[step])
           new_sub = "crab_{}_{}_{}.py".format(steps[step],folder_name,args.year)
-          ReadReplaceAndWrite("templates/{}".format(cfg),new_cfg,tarball,folder_name,nevents=int(nevents))  
-          ReadReplaceAndWrite("templates/{}".format(sub),new_sub,tarball,folder_name,nevents=int(nevents))
+          ReadReplaceAndWrite("templates/{}".format(cfg),new_cfg,tarball,folder_name,args.year,nevents=int(nevents))  
+          ReadReplaceAndWrite("templates/{}".format(sub),new_sub,tarball,folder_name,args.year,nevents=int(nevents))
           setup_file = ["source /cvmfs/cms.cern.ch/cmsset_default.sh",
                       "if [ -r {} ] ; then".format(CMSSW),
                       "  echo release {} already exists".format(CMSSW),
@@ -110,8 +111,8 @@ else:
  
   new_cfg = "{}_{}_cfg.py".format(steps[step],args.year)
   new_sub = "crab_{}_{}.py".format(steps[step],args.year)
-  ReadReplaceAndWrite("templates/{}_{}_cfg.py".format(steps[step],args.year),new_cfg,"","")
-  ReadReplaceAndWrite("templates/crab_{}_{}.py".format(steps[step],args.year),new_sub,"","",add_tasks=True,lines_to_add=tasks_to_add)
+  ReadReplaceAndWrite("templates/{}_{}_cfg.py".format(steps[step],args.year),new_cfg,"","",args.year)
+  ReadReplaceAndWrite("templates/crab_{}.py".format(steps[step]),new_sub,"","",args.year,add_tasks=True,lines_to_add=tasks_to_add)
   setup_file = ["source /cvmfs/cms.cern.ch/cmsset_default.sh",
               "if [ -r {} ] ; then".format(CMSSW),
               "  echo release {} already exists".format(CMSSW),
