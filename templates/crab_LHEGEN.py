@@ -3,7 +3,7 @@ from CRABClient.UserUtilities import config
 config = config()
 
 config.General.requestName     = 'SAMPLE_FILENAME'
-config.General.workArea        = 'SAMPLE_FILENAME'
+config.General.workArea        = 'SAMPLE_FILENAME_YEAR_NAME'
 config.General.transferOutputs = True
 config.General.transferLogs    = True
 #config.JobType.numCores = 4

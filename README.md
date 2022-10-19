@@ -1,5 +1,15 @@
 # GenSubmissions
 
+## Setting up environment
+
+To set up your environment run the following commands.
+
+```bash
+source /vols/grid/cms/setup.sh 
+voms-proxy-init -voms cms
+source /cvmfs/cms.cern.ch/crab3/crab.sh
+```
+
 ## Submitting each analysis step crab jobs
 
 To submit LHEGEN crab jobs for all tarball files run a command like:
@@ -8,7 +18,7 @@ To submit LHEGEN crab jobs for all tarball files run a command like:
 python run_gridpacks.py --run_all --year=2018
 ```
 
-To run future steps, you can run the identical command. The templates/cmssw_to_use_YEAR.txt keeps track of what stage you are at.
+The other years currently available are 2016_preVFP, 2016_preVFP, 2017 and 2018. If the gridpacks are not in your gridpacks folder, you can point to them using the --gridpacks option. To run future steps, you can run the identical command. The templates/cmssw_to_use_YEAR.txt keeps track of what stage you are at.
 
 ## Checking and resubmitting crab jobs
 
