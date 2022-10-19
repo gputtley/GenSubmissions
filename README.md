@@ -8,6 +8,7 @@ To set up your environment run the following commands.
 source /vols/grid/cms/setup.sh 
 voms-proxy-init -voms cms
 source /cvmfs/cms.cern.ch/crab3/crab.sh
+SCRAM_ARCH=slc7_amd64_gcc700
 ```
 
 ## Submitting each analysis step crab jobs
