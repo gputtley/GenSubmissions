@@ -18,7 +18,7 @@ To submit LHEGEN crab jobs for all tarball files run a command like:
 python run_gridpacks.py --run_all --year=2018
 ```
 
-The other years currently available are 2016_preVFP, 2016_preVFP, 2017 and 2018. If the gridpacks are not in your gridpacks folder, you can point to them using the --gridpacks option. To run future steps, you can run the identical command. The templates/cmssw_to_use_YEAR.txt keeps track of what stage you are at.
+The other years currently available are 2016_preVFP, 2016_preVFP, 2017 and 2018. If the gridpacks are not in your gridpacks folder, you can point to them using the --input option. To run future steps, you can run the identical command. The templates/cmssw_to_use_YEAR.txt keeps track of what stage you are at.
 
 ## Checking and resubmitting crab jobs
 
