@@ -16,7 +16,7 @@ config.Data.inputDBS             = 'phys03'
 config.Data.splitting            = 'EventAwareLumiBased'
 config.Data.unitsPerJob          = 1000
 config.Data.totalUnits           = -1
-config.Data.outLFNDirBase        = '/store/user/guttley/SIM/'
+config.Data.outLFNDirBase        = '/store/user/USER_NAME/SIM/'
 config.Data.publication          = True
 config.Data.ignoreLocality      = True
 

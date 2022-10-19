@@ -16,7 +16,7 @@ config.Data.inputDBS             = 'phys03'
 config.Data.splitting            = 'EventAwareLumiBased'
 config.Data.unitsPerJob          = 1000
 config.Data.totalUnits           = -1
-config.Data.outLFNDirBase        = '/store/user/guttley/MiniAOD/'
+config.Data.outLFNDirBase        = '/store/USER_NAME/guttley/MiniAOD/'
 config.Data.publication          = True
 config.Data.ignoreLocality      = True
 

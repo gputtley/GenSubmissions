@@ -2,21 +2,21 @@ from CRABClient.UserUtilities import config
 from multiprocessing import Process
 config = config()
 
-config.General.requestName     = 'Premix'
-config.General.workArea        = 'Premix'
+config.General.requestName     = 'RECO'
+config.General.workArea        = 'RECO'
 config.General.transferOutputs = True
 config.General.transferLogs    = True
 config.JobType.numCores = 8
 config.JobType.maxMemoryMB = 15000
 
 config.JobType.pluginName = 'ANALYSIS'
-config.JobType.psetName   = 'Premix_YEAR_NAME_cfg.py'
+config.JobType.psetName   = 'RECO_YEAR_NAME_cfg.py'
 
 config.Data.inputDBS             = 'phys03'
 config.Data.splitting            = 'EventAwareLumiBased'
 config.Data.unitsPerJob          = 1000
 config.Data.totalUnits           = -1
-config.Data.outLFNDirBase        = '/store/user/USER_NAME/Premix/'
+config.Data.outLFNDirBase        = '/store/user/USER_NAME/RECO/'
 config.Data.publication          = True
 config.Data.ignoreLocality      = True
 
