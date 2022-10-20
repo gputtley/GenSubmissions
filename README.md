@@ -34,7 +34,7 @@ python check_and_resubmit_crab_jobs.py --multiple_directories --resubmit
 For all later stages you can plug in the crab submission directory as input.
 
 ```bash
-python check_and_resubmit_crab_jobs.py --directory=PREMIX --resubmit
+python check_and_resubmit_crab_jobs.py --directory=CMSSW_X_Y_Z/src/PREMIX --resubmit
 ```
 
 If you want to resubmit jobs when you are idle, you can add options like --duration=300 --interval=30. This will try and resubmit jobs every 30 minutes for 5 hours.
