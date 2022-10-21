@@ -51,10 +51,9 @@ def get_dataset(folder,steps,cmssws,step):
   pCMSSW = cmssws[step-1]
   year = args.year
   if step == 1:
-    os.system("crab status %(pCMSSW)s/src/%(folder)s/crab_%(folder)s >> crab_status_output.txt" % vars())
+    os.system("cdr=$(pwd); cd %(pCMSSW)s/src/%(folder)s_%(year)s; eval `scram runtime -sh`; crab status crab_%(folder)s >> ${cdr}/crab_status_output.txt" % vars())
   else:
-      print "crab status %(pCMSSW)s/src/%(ps)s/crab_%(folder)s_%(year)s_%(ps)s >> crab_status_output.txt" % vars()
-      os.system("crab status %(pCMSSW)s/src/%(ps)s/crab_%(folder)s_%(year)s_%(ps)s >> crab_status_output.txt" % vars())
+      os.system("cdr=$(pwd); cd %(pCMSSW)s/src/%(ps)s; eval `scram runtime -sh`; crab status crab_%(folder)s_%(year)s_%(ps)s >> ${cdr}/crab_status_output.txt" % vars())
   crab_status_file = open('crab_status_output.txt', 'r')
   for line in crab_status_file:
     if "Output dataset:" in line:
@@ -112,7 +111,7 @@ else:
  
   new_cfg = "{}_{}_cfg.py".format(steps[step],args.year)
   new_sub = "crab_{}_{}.py".format(steps[step],args.year)
-  ReadReplaceAndWrite("templates/{}_{}_cfg.py".format(steps[step],args.year),new_cfg,"","",args.year.args.username)
+  ReadReplaceAndWrite("templates/{}_{}_cfg.py".format(steps[step],args.year),new_cfg,"","",args.year,args.username)
   ReadReplaceAndWrite("templates/crab_{}.py".format(steps[step]),new_sub,"","",args.year,args.username,add_tasks=True,lines_to_add=tasks_to_add)
   setup_file = ["source /cvmfs/cms.cern.ch/cmsset_default.sh",
               "if [ -r {} ] ; then".format(CMSSW),
