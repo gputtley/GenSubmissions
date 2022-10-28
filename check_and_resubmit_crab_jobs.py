@@ -79,7 +79,25 @@ while (time.time() - start_time) < int(args.duration)*60:
     
         status_dict[folder] = {"Finished":0,"Running":0,"Transferring":0,"Failed":0,"Idle":0,"Exit Codes":""} # set up dictionary for each folder
         status_dict = get_status(folder,status_dict,args.directory,resubmit=args.resubmit)
-        status_dict[folder]["Percentage"] = 100*round(float(status_dict[folder]["Finished"])/float(status_dict[folder]["Finished"]+status_dict[folder]["Running"]+status_dict[folder]["Transferring"]+status_dict[folder]["Failed"]+status_dict[folder]["Idle"]),5)
+        if (status_dict[folder]["Finished"]+status_dict[folder]["Running"]+status_dict[folder]["Transferring"]+status_dict[folder]["Failed"]+status_dict[folder]["Idle"]) == 0:
+          status_dict[folder]["Percentage"] = 0.0
+        else:
+          status_dict[folder]["Percentage"] = 100*round(float(status_dict[folder]["Finished"])/float(status_dict[folder]["Finished"]+status_dict[folder]["Running"]+status_dict[folder]["Transferring"]+status_dict[folder]["Failed"]+status_dict[folder]["Idle"]),5)
+
+
+  # get total
+  total_dict = {"Finished":0,"Running":0,"Transferring":0,"Failed":0,"Idle":0,"Exit Codes":""}
+  for key, val in status_dict.items():
+    total_dict["Finished"] = total_dict["Finished"] + val["Finished"]
+    total_dict["Running"] = total_dict["Running"] + val["Running"]
+    total_dict["Transferring"] = total_dict["Transferring"] + val["Transferring"]
+    total_dict["Failed"] = total_dict["Failed"] + val["Failed"]
+    total_dict["Idle"] = total_dict["Idle"] + val["Idle"]
+
+  if (total_dict["Finished"]+total_dict["Running"]+total_dict["Transferring"]+total_dict["Failed"]+total_dict["Idle"]) == 0:
+    total_dict["Percentage"] = 0.0
+  else:
+    total_dict["Percentage"] = 100*round(float(total_dict["Finished"])/float(total_dict["Finished"]+total_dict["Running"]+total_dict["Transferring"]+total_dict["Failed"]+total_dict["Idle"]),5)
 
 
   # print dictionary
@@ -100,6 +118,14 @@ while (time.time() - start_time) < int(args.duration)*60:
     for i in range(0,len(entries)): string += "{} {} | ".format(entries[i], " "*(spacing[i]-len(entries[i])))
     print string
   print sep
+
+  entries = ["Total"]
+  for i in headings: entries.append(str(total_dict[i]))
+  string = "| "
+  for i in range(0,len(entries)): string += "{} {} | ".format(entries[i], " "*(spacing[i]-len(entries[i])))
+  print string
+  print sep
+
   print "Number of files:", len(status_dict)  
   
   time.sleep(int(args.interval)*60)
